@@ -62,6 +62,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<BookService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 var app = builder.Build();

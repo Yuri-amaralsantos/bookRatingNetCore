@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserAuthApi.Data;
 using UserAuthApi.Models;
@@ -21,34 +20,31 @@ namespace UserAuthApi.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] User user)
+        public IActionResult Register([FromBody] AuthRequestDto registerDto)
         {
-            if (_context.Users.Any(u => u.Username == user.Username))
+            if (_context.Users.Any(u => u.Username == registerDto.Username))
                 return BadRequest("Username already exists");
 
-            user.Password = _authService.HashPassword(user.Password);
+            var user = new User
+            {
+                Username = registerDto.Username,
+                Password = _authService.HashPassword(registerDto.Password)
+            };
+
             _context.Users.Add(user);
             _context.SaveChanges();
             return Ok("User registered successfully");
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] User loginUser)
+        public IActionResult Login([FromBody] AuthRequestDto loginDto)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Username == loginUser.Username);
-            if (user == null || user.Password != _authService.HashPassword(loginUser.Password))
+            var user = _context.Users.FirstOrDefault(u => u.Username == loginDto.Username);
+            if (user == null || user.Password != _authService.HashPassword(loginDto.Password))
                 return Unauthorized("Invalid credentials");
 
             var token = _authService.GenerateJwtToken(user);
             return Ok(new { token });
-        }
-
-        // 🔹 Protected Route: Requires Authentication
-        [HttpGet("test")]
-        [Authorize]
-        public IActionResult TestAuth()
-        {
-            return Ok(new { message = "You are authenticated!" });
         }
     }
 }
