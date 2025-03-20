@@ -26,7 +26,7 @@ namespace UserAuthApi.Controllers
             if (_context.Users.Any(u => u.Username == user.Username))
                 return BadRequest("Username already exists");
 
-            user.PasswordHash = _authService.HashPassword(user.PasswordHash);
+            user.Password = _authService.HashPassword(user.Password);
             _context.Users.Add(user);
             _context.SaveChanges();
             return Ok("User registered successfully");
@@ -36,7 +36,7 @@ namespace UserAuthApi.Controllers
         public IActionResult Login([FromBody] User loginUser)
         {
             var user = _context.Users.FirstOrDefault(u => u.Username == loginUser.Username);
-            if (user == null || user.PasswordHash != _authService.HashPassword(loginUser.PasswordHash))
+            if (user == null || user.Password != _authService.HashPassword(loginUser.Password))
                 return Unauthorized("Invalid credentials");
 
             var token = _authService.GenerateJwtToken(user);

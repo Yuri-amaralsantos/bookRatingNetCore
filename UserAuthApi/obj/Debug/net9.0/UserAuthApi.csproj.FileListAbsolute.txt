@@ -169,3 +169,4 @@ C:\Users\w10\Documents\projects\meu\bookRatingNetCore\UserAuthApi\obj\Debug\net9
 C:\Users\w10\Documents\projects\meu\bookRatingNetCore\UserAuthApi\obj\Debug\net9.0\UserAuthApi.pdb
 C:\Users\w10\Documents\projects\meu\bookRatingNetCore\UserAuthApi\obj\Debug\net9.0\UserAuthApi.genruntimeconfig.cache
 C:\Users\w10\Documents\projects\meu\bookRatingNetCore\UserAuthApi\obj\Debug\net9.0\ref\UserAuthApi.dll
+C:\Users\w10\Documents\projects\meu\bookRatingNetCore\UserAuthApi\obj\Debug\net9.0\UserAuthApi.sourcelink.json
