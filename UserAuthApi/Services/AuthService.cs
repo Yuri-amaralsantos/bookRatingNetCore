@@ -35,7 +35,10 @@ namespace UserAuthApi.Services
             var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("username", user.Username) }),
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name, user.Username) // ✅ Ensure token contains the username
+                }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
