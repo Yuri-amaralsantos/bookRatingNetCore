@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using UserAuthApi.Data;
 using UserAuthApi.Models;
 using UserAuthApi.Services;
 using System.Linq;
+using System.Security.Claims;
 
 namespace UserAuthApi.Controllers
 {
@@ -45,6 +47,16 @@ namespace UserAuthApi.Controllers
 
             var token = _authService.GenerateJwtToken(user);
             return Ok(new { token });
+        }
+
+        [Authorize] // Requires authentication
+        [HttpGet("test-auth")]
+        public IActionResult TestAuth()
+        {
+            var userIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var username = userIdentity?.FindFirst(ClaimTypes.Name)?.Value;
+
+            return Ok(new { message = "Authenticated successfully", user = username });
         }
     }
 }

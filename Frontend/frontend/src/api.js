@@ -17,8 +17,23 @@ export const registerUser = async (username, password) => {
 export const loginUser = async (username, password) => {
     try {
         const response = await api.post("auth/login", { username, password });
+        if (response.data.token) {
+            localStorage.setItem("token", response.data.token); // Save token
+        }
         return response.data;
     } catch (error) {
         return error.response?.data || "Login failed";
+    }
+};
+
+
+export const testAuth = async (token) => {
+    try {
+        const response = await api.get("auth/test-auth", {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        return error.response?.data || "Authentication test failed";
     }
 };
