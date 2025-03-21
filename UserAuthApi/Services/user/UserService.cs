@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using UserAuthApi.Data;
 using UserAuthApi.Models;
 
@@ -16,18 +17,25 @@ namespace UserAuthApi.Services
 
         public List<object> GetUserBooks(string username)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Username == username);
-            if (user == null) return null;
+            var user = _context.Users.SingleOrDefault(u => u.Username == username);
+            if (user == null) return new List<object>();  // Retorna lista vazia ao invés de null
 
             return _context.UserBooks
                 .Where(ub => ub.UserId == user.Id)
-                .Select(ub => new { ub.Book.Id, ub.Book.Title, ub.Book.Author, ub.Book.Description })
+                .Include(ub => ub.Book)  // Garante que o livro está carregado
+                .Select(ub => new 
+                { 
+                    ub.Book.Id, 
+                    ub.Book.Title, 
+                    ub.Book.Author, 
+                    ub.Book.Description 
+                })
                 .ToList<object>();
         }
 
         public bool AddBookToUser(string username, int bookId, out string message)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Username == username);
+            var user = _context.Users.SingleOrDefault(u => u.Username == username);
             if (user == null)
             {
                 message = "User not found";
@@ -47,7 +55,7 @@ namespace UserAuthApi.Services
                 return false;
             }
 
-            _context.UserBooks.Add(new UserBooks { UserId = user.Id, BookId = bookId });
+            _context.UserBooks.Add(new UserBook { UserId = user.Id, BookId = bookId });
             _context.SaveChanges();
 
             message = "Book added to your list";
@@ -56,7 +64,7 @@ namespace UserAuthApi.Services
 
         public bool RemoveBookFromUser(string username, int bookId, out string message)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Username == username);
+            var user = _context.Users.SingleOrDefault(u => u.Username == username);
             if (user == null)
             {
                 message = "User not found";

@@ -63,8 +63,15 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy.WithOrigins("http://localhost:5173") // Adjust if needed
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 var app = builder.Build();
 
 app.UseSwagger();
@@ -73,6 +80,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowFrontend");
 app.MapControllers();
 
 app.Run();
