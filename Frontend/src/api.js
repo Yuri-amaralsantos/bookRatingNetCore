@@ -39,24 +39,13 @@ export const testAuth = async (token) => {
 
 export const fetchBooks = async (token) => {
     try {
-        const [allBooksResponse, userBooksResponse] = await Promise.all([
-            api.get("books", { headers: { Authorization: `Bearer ${token}` } }),
-            api.get("user/books", { headers: { Authorization: `Bearer ${token}` } })
-        ]);
-
-        const allBooks = allBooksResponse.data;
-        const userBooks = userBooksResponse.data;
-
-        // Filter books that are not in the user's list
-        const availableBooks = allBooks.filter(book =>
-            !userBooks.some(userBook => userBook.id === book.id)
-        );
-
-        return availableBooks;
+        const response = await api.get("books", { headers: { Authorization: `Bearer ${token}` } });
+        return response.data;
     } catch (error) {
-        return error.response?.data || "Failed to fetch available books";
+        return error.response?.data || "Failed to fetch books";
     }
 };
+
 
 export const getUserBooks = async (token) => {
     try {
@@ -69,16 +58,7 @@ export const getUserBooks = async (token) => {
     }
 };
 
-export const getAllBooks = async (token) => {
-    try {
-        const response = await api.get("books", {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return response.data;
-    } catch (error) {
-        return error.response?.data || "Failed to fetch all books";
-    }
-};
+
 
 export const addBookToUser = async (token, bookId) => {
     try {
@@ -99,5 +79,68 @@ export const removeBookFromUser = async (token, bookId) => {
         return response.data;
     } catch (error) {
         return error.response?.data || "Failed to remove book from user";
+    }
+};
+
+export const getBookById = async (token, bookId) => {
+    try {
+        const response = await api.get(`books/${bookId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        return error.response?.data || "Failed to fetch book details";
+    }
+};
+
+export const getUserReviews = async (token) => {
+    try {
+        const response = await api.get("reviews/user", {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return Array.isArray(response.data) ? response.data : []; // Ensure we return an array
+    } catch (error) {
+        return []; // If any error occurs, return an empty array
+    }
+};
+
+
+
+
+export const getReviewsForBook = async (token, bookId) => {
+    try {
+        const response = await api.get(`reviews/book/${bookId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        return error.response?.data || "Failed to fetch book reviews";
+    }
+};
+
+export const addReview = async (token, reviewData) => {
+    try {
+        const response = await api.post("reviews/add", reviewData, {  // Ensure correct endpoint
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error adding review:", error.response?.data); // Log backend error
+        return error.response?.data || "Failed to add review";
+    }
+};
+
+
+export const removeReview = async (token, reviewId) => {
+    try {
+        const response = await api.delete(`reviews/remove/${reviewId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        return error.response?.data || "Failed to remove review";
     }
 };

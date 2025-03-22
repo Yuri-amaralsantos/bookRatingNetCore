@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserAuthApi.Services;
 using UserAuthApi.DTOs;
+using System.Security.Claims;
 
 [Route("api/reviews")]
 [ApiController]
+[Authorize] // Ensures only authenticated users can access these endpoints
 public class ReviewController : ControllerBase
 {
     private readonly IReviewService _reviewService;
@@ -16,12 +19,21 @@ public class ReviewController : ControllerBase
     [HttpPost("add")]
     public IActionResult AddReview([FromBody] AddReviewDto reviewDto)
     {
+        var username = User.FindFirstValue(ClaimTypes.Name); // Get authenticated user's username
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized(new { message = "User not authenticated" });
+        }
+
+        reviewDto.Username = username; // Ensure the review is linked to the authenticated user
+
         if (_reviewService.AddReview(reviewDto, out string message))
         {
             return Ok(new { message });
         }
         return BadRequest(new { message });
     }
+
 
     [HttpGet("book/{bookId}")]
     public IActionResult GetReviewsForBook(int bookId)
@@ -30,14 +42,28 @@ public class ReviewController : ControllerBase
         return Ok(reviews);
     }
 
-    [HttpGet("user/{username}")]
-    public IActionResult GetReviewsByUser(string username)
+    [HttpGet("user")] // Removed {username} from the route
+    public IActionResult GetReviewsByUser()
     {
-        var reviews = _reviewService.GetReviewsByUser(username);
-        if (reviews.Count == 0)
+        var username = User.FindFirstValue(ClaimTypes.Name); // Get authenticated user's username
+        if (string.IsNullOrEmpty(username))
         {
-            return NotFound(new { message = "No reviews found for this user" });
+            return Unauthorized(new { message = "User not authenticated" });
         }
-        return Ok(reviews);
+
+        var reviews = _reviewService.GetReviewsByUser(username);
+        
+        // Return an empty array instead of 404 if no reviews are found
+        return Ok(reviews.Any() ? reviews : new List<object>());
+    }
+
+    [HttpDelete("remove/{reviewId}")]
+    public IActionResult DeleteReview(int reviewId)
+    {
+        if (_reviewService.DeleteReview(reviewId, out string message))
+        {
+            return Ok(new { message });
+        }
+        return BadRequest(new { message });
     }
 }

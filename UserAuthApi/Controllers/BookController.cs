@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserAuthApi.Models;
 using UserAuthApi.Services;
+using UserAuthApi.DTOs;
 
 namespace UserAuthApi.Controllers
 {
@@ -32,30 +33,18 @@ namespace UserAuthApi.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult CreateBook([FromBody] Book book)
+        public IActionResult CreateBook([FromBody] BookDto bookDto)
         {
-            _bookService.CreateBook(book);
+            var newBook = new Book
+            {
+                Title = bookDto.Title,
+                Author = bookDto.Author,
+                Description = bookDto.Description,
+                PublishedYear = bookDto.PublishedYear
+            };
+
+            _bookService.CreateBook(newBook);
             return Ok("Book created successfully");
-        }
-
-        [HttpPut("{id}")]
-        [Authorize]
-        public IActionResult UpdateBook(int id, [FromBody] Book updatedBook)
-        {
-            if (!_bookService.UpdateBook(id, updatedBook))
-                return NotFound("Book not found");
-
-            return Ok("Book updated successfully");
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize]
-        public IActionResult DeleteBook(int id)
-        {
-            if (!_bookService.DeleteBook(id))
-                return NotFound("Book not found");
-
-            return Ok("Book deleted successfully");
         }
     }
 }

@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import User from "./pages/User";
 import Books from "./pages/Books";
 import NavBar from "./components/Navbar"; // Import NavBar
+import BookPage from "./pages/BookPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/user" element={<User />} />
         <Route path="/books" element={<Books />} />
+        <Route path="/book/:bookId" element={<BookPage />} />
       </Routes>
     </Router>
   );

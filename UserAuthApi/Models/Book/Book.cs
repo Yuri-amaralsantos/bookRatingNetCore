@@ -16,10 +16,10 @@ namespace UserAuthApi.Models
 
         public string Description { get; set; }
 
-        // Many-to-Many relationship: Books can be in multiple users' lists
-        public List<UserBook> UserBooks { get; set; } = new List<UserBook>();
+        public int PublishedYear { get; set; } // Add this field
 
-        // One-to-Many relationship: Books can have multiple reviews
+        // Relationships
+        public List<UserBook> UserBooks { get; set; } = new List<UserBook>();
         public List<Review> Reviews { get; set; } = new List<Review>();
     }
 }

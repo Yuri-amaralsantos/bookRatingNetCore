@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 function Books() {
@@ -20,7 +21,9 @@ function Books() {
       {books.length > 0 ? (
         <ul>
           {books.map((book) => (
-            <li key={book.id}>{book.title}</li>
+            <li key={book.id}>
+              <Link to={`/book/${book.id}`}>{book.title}</Link>
+            </li>
           ))}
         </ul>
       ) : (

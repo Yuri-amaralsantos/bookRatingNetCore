@@ -84,5 +84,22 @@ namespace UserAuthApi.Services
                 })
                 .ToList();
         }
+
+        public bool DeleteReview(int reviewId, out string message)
+        {
+            var review = _context.Reviews.Find(reviewId);
+            if (review == null)
+            {
+                message = "Review not found";
+                return false;
+            }
+
+            _context.Reviews.Remove(review);
+            _context.SaveChanges();
+
+            message = "Review removed successfully";
+            return true;
+        }
+
     }
 }
