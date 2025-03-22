@@ -15,7 +15,8 @@ function Login() {
     const result = await loginUser(username, password);
     if (result.token) {
       localStorage.setItem("token", result.token);
-      navigate("/");
+      navigate("/"); // Navigate to Home
+      window.location.reload(); // Reload the page
     } else {
       setError(result);
     }
