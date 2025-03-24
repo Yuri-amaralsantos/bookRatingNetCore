@@ -19,12 +19,14 @@ export const loginUser = async (username, password) => {
         const response = await api.post("auth/login", { username, password });
         if (response.data.token) {
             localStorage.setItem("token", response.data.token);
+            localStorage.setItem("username", response.data.username); // Store the username
         }
         return response.data;
     } catch (error) {
         return error.response?.data || "Login failed";
     }
 };
+
 
 export const testAuth = async (token) => {
     try {

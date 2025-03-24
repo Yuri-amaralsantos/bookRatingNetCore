@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   getUserBooks,
   testAuth,
   fetchBooks,
   addBookToUser,
   removeBookFromUser,
-  getUserReviews,
-  addReview,
 } from "../api";
 
 function User() {
@@ -16,12 +14,8 @@ function User() {
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
-  const [reviews, setReviews] = useState([]);
-  const [reviewForm, setReviewForm] = useState({
-    bookId: "",
-    rating: 1,
-    comment: "",
-  });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -51,14 +45,6 @@ function User() {
           : setError("Failed to fetch books.")
       )
       .catch(() => setError("Error fetching books."));
-
-    getUserReviews(token)
-      .then((data) =>
-        Array.isArray(data)
-          ? setReviews(data)
-          : setError("Failed to fetch user reviews.")
-      )
-      .catch(() => setError("Error fetching user reviews."));
   }, []);
 
   const handleAddBook = async (bookId) => {
@@ -96,41 +82,9 @@ function User() {
     }
   };
 
-  const handleAddReview = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("You are not logged in.");
-      return;
-    }
-
-    const reviewData = {
-      bookId: Number(reviewForm.bookId),
-      rating: Number(reviewForm.rating),
-      comment: reviewForm.comment.trim(),
-      username: user,
-    };
-
-    if (!reviewData.username) {
-      setError("username required");
-      return;
-    }
-
-    if (!reviewData.bookId || !reviewData.comment) {
-      setError("Book and comment are required.");
-      return;
-    }
-
-    const result = await addReview(token, reviewData);
-
-    if (typeof result === "string") {
-      setError(result);
-    } else {
-      setReviews([...reviews, result]);
-      setReviewForm({ bookId: "", rating: 1, comment: "" });
-    }
+  const handleReviewRedirect = (bookId) => {
+    navigate(`/review/${bookId}`);
   };
-
   return (
     <div>
       <h1>User Profile</h1>
@@ -153,6 +107,9 @@ function User() {
                 <button onClick={() => handleRemoveBook(book.id)}>
                   Remove
                 </button>
+                <button onClick={() => handleReviewRedirect(book.id)}>
+                  Review
+                </button>
               </li>
             ))}
           </ul>
@@ -165,6 +122,12 @@ function User() {
           />
 
           <h2>Available Books</h2>
+          <input
+            type="text"
+            placeholder="Search books..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
           <ul>
             {filteredBooks.map((book) => (
               <li key={`available-book-${book.id}`}>
@@ -174,68 +137,6 @@ function User() {
               </li>
             ))}
           </ul>
-
-          <h2>Add a Review</h2>
-          <form onSubmit={handleAddReview}>
-            <label>
-              Select Book:
-              <select
-                value={reviewForm.bookId}
-                onChange={(e) =>
-                  setReviewForm({ ...reviewForm, bookId: e.target.value })
-                }
-                required
-              >
-                <option value="">-- Select a book --</option>
-                {filteredBooks.map((book) => (
-                  <option key={`select-book-${book.id}`} value={book.id}>
-                    {book.title}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Rating:
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={reviewForm.rating}
-                onChange={(e) =>
-                  setReviewForm({ ...reviewForm, rating: e.target.value })
-                }
-                required
-              />
-            </label>
-
-            <label>
-              Comment:
-              <textarea
-                value={reviewForm.comment}
-                onChange={(e) =>
-                  setReviewForm({ ...reviewForm, comment: e.target.value })
-                }
-                required
-              />
-            </label>
-
-            <button type="submit">Submit Review</button>
-          </form>
-
-          <h2>Your Reviews</h2>
-          {reviews.length > 0 ? (
-            <ul>
-              {reviews.map((review) => (
-                <li key={`review-${review.id}`}>
-                  <strong>{review.bookTitle}</strong>: {review.comment} - ⭐
-                  {review.rating}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No reviews yet.</p>
-          )}
         </>
       ) : (
         <p>Loading user information...</p>

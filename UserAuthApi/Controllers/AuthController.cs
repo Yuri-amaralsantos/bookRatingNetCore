@@ -38,7 +38,7 @@ namespace UserAuthApi.Controllers
             return Ok("User registered successfully");
         }
 
-        [HttpPost("login")]
+       [HttpPost("login")]
         public IActionResult Login([FromBody] AuthRequestDto loginDto)
         {
             var user = _context.Users.FirstOrDefault(u => u.Username == loginDto.Username);
@@ -46,8 +46,9 @@ namespace UserAuthApi.Controllers
                 return Unauthorized("Invalid credentials");
 
             var token = _authService.GenerateJwtToken(user);
-            return Ok(new { token });
+            return Ok(new { token, username = user.Username });
         }
+
 
         [Authorize] // Requires authentication
         [HttpGet("test-auth")]

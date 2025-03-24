@@ -1,20 +1,42 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getBookById } from "../api"; // Import API function
+import { getBookById, getReviewsForBook, removeReview } from "../api"; // Import API functions
 
 function BookPage() {
   const { bookId } = useParams(); // Get book ID from URL
   const [book, setBook] = useState(null);
+  const [reviews, setReviews] = useState([]); // State for reviews
   const [error, setError] = useState("");
   const token = localStorage.getItem("token"); // Retrieve token for authentication
+  const currentUser = localStorage.getItem("username");
 
   useEffect(() => {
     if (bookId) {
+      // Fetch book details
       getBookById(token, bookId)
         .then((data) => setBook(data))
         .catch(() => setError("Failed to fetch book details."));
+
+      // Fetch book reviews
+      getReviewsForBook(token, bookId)
+        .then((data) => setReviews(data))
+        .catch(() => setError("Failed to fetch book reviews."));
     }
   }, [bookId, token]);
+
+  const handleRemoveReview = async (reviewId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this review?"
+    );
+    if (!confirmDelete) return;
+
+    const result = await removeReview(token, reviewId);
+    if (typeof result === "string") {
+      setError(result); // Show error if deletion fails
+    } else {
+      setReviews(reviews.filter((review) => review.id !== reviewId)); // Remove deleted review from UI
+    }
+  };
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!book) return <p>Loading...</p>;
@@ -31,6 +53,28 @@ function BookPage() {
       <p>
         <strong>Published:</strong> {book.publishedYear}
       </p>
+
+      <h2>Reviews</h2>
+      {reviews.length > 0 ? (
+        <ul>
+          {reviews.map((review) => (
+            <li key={review.id}>
+              <strong>{review.username}:</strong> {review.comment}
+              {review.username === currentUser && (
+                <button
+                  onClick={() => handleRemoveReview(review.id)}
+                  style={{ marginLeft: "10px", color: "red" }}
+                >
+                  Remove
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No reviews yet.</p>
+      )}
+
       <Link to="/books">Back to Books</Link>
     </div>
   );

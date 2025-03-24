@@ -13,8 +13,10 @@ function Login() {
     setError("");
 
     const result = await loginUser(username, password);
+    console.log("Login result:", result); // Debug output
     if (result.token) {
       localStorage.setItem("token", result.token);
+      localStorage.setItem("username", result.username); // Store username
       navigate("/"); // Navigate to Home
       window.location.reload(); // Reload the page
     } else {
