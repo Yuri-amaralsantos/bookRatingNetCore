@@ -10,12 +10,10 @@ import {
 
 function User() {
   const [user, setUser] = useState(null);
-  const [books, setBooks] = useState([]);
-  const [filteredBooks, setFilteredBooks] = useState([]);
+  const [books, setBooks] = useState([]); // User's books
+  const [filteredBooks, setFilteredBooks] = useState([]); // All books
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,60 +29,55 @@ function User() {
       .catch(() => setError("Authentication request failed."));
 
     getUserBooks(token)
-      .then((data) =>
-        Array.isArray(data)
-          ? setBooks(data)
-          : setError("Failed to fetch user's books.")
-      )
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setBooks(data);
+        } else {
+          setError("Failed to fetch user's books.");
+        }
+      })
       .catch(() => setError("Error fetching user books."));
 
     fetchBooks(token)
-      .then((data) =>
-        Array.isArray(data)
-          ? setFilteredBooks(data) // Now this contains all books
-          : setError("Failed to fetch books.")
-      )
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setFilteredBooks(data);
+        } else {
+          setError("Failed to fetch books.");
+        }
+      })
       .catch(() => setError("Error fetching books."));
   }, []);
 
+  const updateBooks = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const updatedBooks = await getUserBooks(token);
+    console.log("Updated books:", updatedBooks);
+    setBooks(updatedBooks); // Only updates books without triggering full re-fetch
+  };
+
   const handleAddBook = async (bookId) => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setError("You are not logged in.");
-      return;
-    }
-
-    if (books.some((book) => book.id === bookId)) {
-      setError("Book is already in your list.");
-      return;
-    }
-
+    if (!token) return;
     const result = await addBookToUser(token, bookId);
-    if (typeof result === "string") {
-      setError(result);
-    } else {
-      setBooks([...books, result]); // Update books list
-    }
+
+    setError(result);
+    updateBooks();
   };
 
   const handleRemoveBook = async (bookId) => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setError("You are not logged in.");
-      return;
-    }
+    if (!token) return;
 
     const result = await removeBookFromUser(token, bookId);
-    if (typeof result === "string") {
-      setError(result);
-    } else {
-      setBooks(books.filter((book) => book.id !== bookId)); // Remove book from list
-    }
+    console.log(typeof result === "string");
+    console.log(result);
+
+    updateBooks();
   };
 
-  const handleReviewRedirect = (bookId) => {
-    navigate(`/review/${bookId}`);
-  };
   return (
     <div>
       <h1>User Profile</h1>
@@ -94,10 +87,6 @@ function User() {
 
       {user ? (
         <>
-          <p>
-            Welcome, <strong>{user.name}</strong>!
-          </p>
-
           <h2>Your Books</h2>
           <ul>
             {books.map((book) => (
@@ -107,21 +96,11 @@ function User() {
                 <button onClick={() => handleRemoveBook(book.id)}>
                   Remove
                 </button>
-                <button onClick={() => handleReviewRedirect(book.id)}>
-                  Review
-                </button>
               </li>
             ))}
           </ul>
 
-          <input
-            type="text"
-            placeholder="Search books..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          <h2>Available Books</h2>
+          <h2>All Books</h2>
           <input
             type="text"
             placeholder="Search books..."
@@ -129,13 +108,17 @@ function User() {
             onChange={(e) => setSearch(e.target.value)}
           />
           <ul>
-            {filteredBooks.map((book) => (
-              <li key={`available-book-${book.id}`}>
-                <Link to={`/book/${book.id}`}>{book.title}</Link> by{" "}
-                {book.author}{" "}
-                <button onClick={() => handleAddBook(book.id)}>Add</button>
-              </li>
-            ))}
+            {filteredBooks
+              .filter((book) =>
+                book.title.toLowerCase().includes(search.toLowerCase())
+              )
+              .map((book) => (
+                <li key={`available-book-${book.id}`}>
+                  <Link to={`/book/${book.id}`}>{book.title}</Link> by{" "}
+                  {book.author}{" "}
+                  <button onClick={() => handleAddBook(book.id)}>Add</button>
+                </li>
+              ))}
           </ul>
         </>
       ) : (

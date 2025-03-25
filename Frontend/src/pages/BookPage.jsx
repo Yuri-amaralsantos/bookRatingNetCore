@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getBookById, getReviewsForBook, removeReview } from "../api"; // Import API functions
+import {
+  getBookById,
+  getReviewsForBook,
+  removeReview,
+  addReview,
+} from "../api"; // Import API functions
 
 function BookPage() {
   const { bookId } = useParams(); // Get book ID from URL
   const [book, setBook] = useState(null);
   const [reviews, setReviews] = useState([]); // State for reviews
+  const [newReview, setNewReview] = useState(""); // State for new review input
   const [error, setError] = useState("");
   const token = localStorage.getItem("token"); // Retrieve token for authentication
   const currentUser = localStorage.getItem("username");
@@ -35,6 +41,29 @@ function BookPage() {
       setError(result); // Show error if deletion fails
     } else {
       setReviews(reviews.filter((review) => review.id !== reviewId)); // Remove deleted review from UI
+    }
+  };
+
+  const handleAddReview = async () => {
+    if (!newReview.trim()) {
+      setError("Review cannot be empty.");
+      return;
+    }
+
+    const username = localStorage.getItem("username"); // Get username from localStorage
+    if (!username) {
+      setError("User is not authenticated.");
+      return;
+    }
+
+    const reviewData = { bookId, comment: newReview, username }; // Include username
+
+    const result = await addReview(token, reviewData);
+    if (typeof result === "string") {
+      setError(result); // Show error if adding review fails
+    } else {
+      setReviews([...reviews, result]); // Append new review
+      setNewReview(""); // Clear input field
     }
   };
 
@@ -74,6 +103,20 @@ function BookPage() {
       ) : (
         <p>No reviews yet.</p>
       )}
+
+      {/* Add Review Form */}
+      <div>
+        <h3>Add a Review</h3>
+        <textarea
+          value={newReview}
+          onChange={(e) => setNewReview(e.target.value)}
+          placeholder="Write your review..."
+          rows="3"
+          cols="40"
+        ></textarea>
+        <br />
+        <button onClick={handleAddReview}>Submit Review</button>
+      </div>
 
       <Link to="/books">Back to Books</Link>
     </div>

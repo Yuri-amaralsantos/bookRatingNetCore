@@ -27,12 +27,31 @@ public class ReviewController : ControllerBase
 
         reviewDto.Username = username; // Ensure the review is linked to the authenticated user
 
+        // Manual validation of required fields
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(reviewDto.Comment))
+        {
+            errors.Add("Comment is required.");
+        }
+        if (reviewDto.BookId <= 0)
+        {
+            errors.Add("Invalid BookId.");
+        }
+
+        if (errors.Any())
+        {
+            return BadRequest(new { message = "Validation failed", errors });
+        }
+
         if (_reviewService.AddReview(reviewDto, out string message))
         {
             return Ok(new { message });
         }
+
         return BadRequest(new { message });
     }
+
 
 
     [HttpGet("book/{bookId}")]

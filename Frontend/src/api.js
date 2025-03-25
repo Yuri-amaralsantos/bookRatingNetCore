@@ -67,11 +67,15 @@ export const addBookToUser = async (token, bookId) => {
         const response = await api.post(`user/books/${bookId}`, {}, {
             headers: { Authorization: `Bearer ${token}` },
         });
+        console.log(response.data);
         return response.data;
     } catch (error) {
+        console.log("Request URL:", `user/books/${bookId}`);
+        console.log("Error Details:", error.response?.data || error.message);
         return error.response?.data || "Failed to add book to user";
     }
 };
+
 
 export const removeBookFromUser = async (token, bookId) => {
     try {
