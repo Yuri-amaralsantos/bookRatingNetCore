@@ -1,0 +1,68 @@
+.user-container {
+  padding: 20px;
+  text-align: left;
+}
+
+.user-title {
+  font-size: 2rem;
+  color: #222;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}
+
+.user-books,
+.all-books {
+  margin-top: 20px;
+}
+
+.user-books ul,
+.all-books ul {
+  list-style: none;
+  padding: 0;
+}
+
+.user-books li,
+.all-books li {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-books a,
+.all-books a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.user-books a:hover,
+.all-books a:hover {
+  color: #0056b3;
+}
+
+.search-bar {
+  margin: 10px 0;
+  padding: 5px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.user-books-button,
+.all-books-button {
+  display: inline-block;
+  margin: 5px;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.user-books-button:hover,
+.all-books-button:hover {
+  background-color: #0056b3;
+}

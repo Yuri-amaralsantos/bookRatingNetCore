@@ -1,0 +1,38 @@
+.home-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.home-title {
+  font-size: 2rem;
+  color: #333;
+}
+
+.auth-message {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.latest-books {
+  margin-top: 20px;
+}
+
+.latest-books ul {
+  list-style: none;
+  padding: 0;
+}
+
+.latest-books li {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.latest-books a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.latest-books a:hover {
+  color: #0056b3;
+}

@@ -6,6 +6,7 @@ import {
   removeReview,
   addReview,
 } from "../api"; // Import API functions
+import "./BookPage.css"; // Import the styles
 
 function BookPage() {
   const { bookId } = useParams(); // Get book ID from URL
@@ -80,8 +81,12 @@ function BookPage() {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!book) return <p>Loading...</p>;
 
+  function renderStars(rating) {
+    return "★".repeat(rating) + "☆".repeat(5 - rating); // Fill stars and empty stars
+  }
+
   return (
-    <div>
+    <div className="book-page">
       <h1>{book.title}</h1>
       <p>
         <strong>Author:</strong> {book.author}
@@ -93,56 +98,56 @@ function BookPage() {
         <strong>Published:</strong> {book.publishedYear}
       </p>
 
-      <h2>Reviews</h2>
-      {reviews.length > 0 ? (
-        <ul>
-          {reviews.map((review) => (
-            <li key={review.id || review.username + review.comment}>
-              {" "}
-              {/* Fallback key */}
-              <strong>{review.username}:</strong> {review.comment}
-              {review.username === currentUser && (
-                <button
-                  onClick={() => handleRemoveReview(review.id)}
-                  style={{ marginLeft: "10px", color: "red" }}
-                >
-                  Remove
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No reviews yet.</p>
-      )}
+      <div className="review-section">
+        <h2>Reviews</h2>
+        {reviews.length > 0 ? (
+          <ul>
+            {reviews.map((review) => (
+              <li key={review.id}>
+                <strong>{review.username}:</strong> {review.comment} <br />
+                <span className="stars">{renderStars(review.rating)}</span>
+                {review.username === currentUser && (
+                  <button
+                    className="remove-button"
+                    onClick={() => handleRemoveReview(review.id)}
+                  >
+                    Remove
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No reviews yet.</p>
+        )}
 
-      {/* Add Review Form */}
-      <div>
-        <h3>Add a Review</h3>
-        <label>
-          Rating:
-          <input
-            type="number"
-            min="1"
-            max="5"
-            value={newReview.rating}
+        {/* Add Review Form */}
+        <div>
+          <h3>Add a Review</h3>
+          <label>
+            Rating:
+            <input
+              type="number"
+              min="1"
+              max="5"
+              value={newReview.rating}
+              onChange={(e) =>
+                setNewReview({ ...newReview, rating: e.target.value })
+              }
+            />
+          </label>
+          <br />
+          <textarea
+            value={newReview.comment}
             onChange={(e) =>
-              setNewReview({ ...newReview, rating: e.target.value })
+              setNewReview({ ...newReview, comment: e.target.value })
             }
-          />
-        </label>
-        <br />
-        <textarea
-          value={newReview.comment}
-          onChange={(e) =>
-            setNewReview({ ...newReview, comment: e.target.value })
-          }
-          placeholder="Write your review..."
-          rows="3"
-          cols="40"
-        ></textarea>
-        <br />
-        <button onClick={handleAddReview}>Submit Review</button>
+            placeholder="Write your review..."
+            rows="3"
+          ></textarea>
+          <br />
+          <button onClick={handleAddReview}>Submit Review</button>
+        </div>
       </div>
 
       <Link to="/books">Back to Books</Link>

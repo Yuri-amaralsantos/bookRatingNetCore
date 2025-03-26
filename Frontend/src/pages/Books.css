@@ -1,0 +1,30 @@
+.books-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.books-title {
+  font-size: 2rem;
+  color: #222;
+}
+
+.books-list {
+  margin-top: 20px;
+  list-style: none;
+  padding: 0;
+}
+
+.books-list li {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.books-list a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.books-list a:hover {
+  color: #0056b3;
+}

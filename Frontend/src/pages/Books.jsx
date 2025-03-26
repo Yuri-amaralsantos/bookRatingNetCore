@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import "./Books.css";
 
 function Books() {
   const [books, setBooks] = useState([]);
@@ -16,19 +17,20 @@ function Books() {
   }, []);
 
   return (
-    <div>
-      <h1>Books Page</h1>
-      {books.length > 0 ? (
-        <ul>
-          {books.map((book) => (
-            <li key={book.id}>
-              <Link to={`/book/${book.id}`}>{book.title}</Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No books found or failed to fetch.</p>
-      )}
+    <div className="books-container">
+      <h1 className="books-title">Books Page</h1>
+      <div className="books-grid">
+        {books.map((book) => (
+          <div key={book.id} className="book-card">
+            <img src="image.jpg" alt={book.title} className="book-image" />
+            <h3>{book.title}</h3>
+            <p>by {book.author}</p>
+            <Link to={`/book/${book.id}`} className="book-link">
+              View Details
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
