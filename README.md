@@ -1,6 +1,6 @@
 # 🗨️ **BookRatingSite**  
 
-Um site de avaliação de livros com frontend React, backend dotnet core, autenticação JWT, e PostgreSQL para gerenciamento de usuários.  
+Um site de avaliação de livros com frontend React, backend dotnet core, autenticação JWT, e PostgreSQL.  
 
 ![Demonstração](Animação.gif)
 
