@@ -1,4 +1,4 @@
-# 🗨️ **Aplicativo de Chat**  
+# 🗨️ **BookRatingSite**  
 
 Um site de avaliação de livros com frontend React, backend dotnet core, autenticação JWT, e PostgreSQL para gerenciamento de usuários.  
 
