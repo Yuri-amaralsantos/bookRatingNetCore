@@ -4,9 +4,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import User from "./pages/User";
 import Books from "./pages/Books";
-import NavBar from "./components/Navbar"; // Import NavBar
+import NavBar from "./components/navbar/Navbar"; // Import NavBar
 import BookPage from "./pages/BookPage";
-import ReviewBook from "./pages/ReviewBook";
 
 function App() {
   return (
@@ -19,7 +18,6 @@ function App() {
         <Route path="/user" element={<User />} />
         <Route path="/books" element={<Books />} />
         <Route path="/book/:bookId" element={<BookPage />} />
-        <Route path="/review/:bookId" element={<ReviewBook />} />
       </Routes>
     </Router>
   );

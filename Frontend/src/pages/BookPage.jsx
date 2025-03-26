@@ -11,7 +11,7 @@ function BookPage() {
   const { bookId } = useParams(); // Get book ID from URL
   const [book, setBook] = useState(null);
   const [reviews, setReviews] = useState([]); // State for reviews
-  const [newReview, setNewReview] = useState(""); // State for new review input
+  const [newReview, setNewReview] = useState({ comment: "", rating: 1 }); // State for new review input
   const [error, setError] = useState("");
   const token = localStorage.getItem("token"); // Retrieve token for authentication
   const currentUser = localStorage.getItem("username");
@@ -45,26 +45,36 @@ function BookPage() {
   };
 
   const handleAddReview = async () => {
-    if (!newReview.trim()) {
+    if (!newReview.comment.trim()) {
       setError("Review cannot be empty.");
       return;
     }
 
-    const username = localStorage.getItem("username"); // Get username from localStorage
+    const username = localStorage.getItem("username");
     if (!username) {
       setError("User is not authenticated.");
       return;
     }
 
-    const reviewData = { bookId, comment: newReview, username }; // Include username
+    const reviewData = {
+      bookId,
+      comment: newReview.comment,
+      rating: Number(newReview.rating), // Ensure it's a number
+      username,
+    };
 
     const result = await addReview(token, reviewData);
     if (typeof result === "string") {
-      setError(result); // Show error if adding review fails
-    } else {
-      setReviews([...reviews, result]); // Append new review
-      setNewReview(""); // Clear input field
+      setError(result);
+      return;
     }
+
+    // Fetch updated reviews list
+    getReviewsForBook(token, bookId)
+      .then((data) => setReviews(data))
+      .catch(() => setError("Failed to refresh reviews."));
+
+    setNewReview({ comment: "", rating: 1 });
   };
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -87,7 +97,9 @@ function BookPage() {
       {reviews.length > 0 ? (
         <ul>
           {reviews.map((review) => (
-            <li key={review.id}>
+            <li key={review.id || review.username + review.comment}>
+              {" "}
+              {/* Fallback key */}
               <strong>{review.username}:</strong> {review.comment}
               {review.username === currentUser && (
                 <button
@@ -107,9 +119,24 @@ function BookPage() {
       {/* Add Review Form */}
       <div>
         <h3>Add a Review</h3>
+        <label>
+          Rating:
+          <input
+            type="number"
+            min="1"
+            max="5"
+            value={newReview.rating}
+            onChange={(e) =>
+              setNewReview({ ...newReview, rating: e.target.value })
+            }
+          />
+        </label>
+        <br />
         <textarea
-          value={newReview}
-          onChange={(e) => setNewReview(e.target.value)}
+          value={newReview.comment}
+          onChange={(e) =>
+            setNewReview({ ...newReview, comment: e.target.value })
+          }
           placeholder="Write your review..."
           rows="3"
           cols="40"

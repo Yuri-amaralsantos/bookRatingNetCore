@@ -18,7 +18,7 @@ function Home() {
 
   return (
     <div>
-      <p>Olá</p>
+      <p></p>
     </div>
   );
 }
