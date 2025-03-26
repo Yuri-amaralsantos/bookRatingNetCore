@@ -59,7 +59,7 @@ Banco de Dados: PostgreSQL
 ## ⚠️ **Notas Importantes**
 
 O site ainda não tem funções de cargos, nem funções para os administradores enviarem novos livros. 
-Qualquer usuário com acesso pode gerenciar os livros através do swagger que pode ser acessado em localhost/swagger.
+Qualquer usuário com acesso pode gerenciar os livros através do swagger que pode ser acessado em localhost:5075/swagger.
 Somente o usuário pode remover sua avaliação, mas ela é vista por todos.
 
 ---
